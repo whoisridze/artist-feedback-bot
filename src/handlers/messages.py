@@ -7,6 +7,11 @@ def register_message_handlers(bot, file_data, recipient_id):
     
     @bot.message_handler(func=lambda message: True)
     def handle_message(message):
+        if not any(c.isalnum() for c in message.text):
+            logger.warning(f'User {message.from_user.id} tried to send emoji-only message')
+            bot.reply_to(message, 'Please include some text in your message, not just emojis.')
+            return
+
         if len(message.text) > 500:
             logger.warning(f'User {message.from_user.id} tried to send message exceeding 500 chars')
             bot.reply_to(message,
