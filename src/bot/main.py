@@ -3,6 +3,7 @@ from src.bot.config import load_config
 from src.bot.storage import read_file
 from src.handlers.commands import register_command_handlers
 from src.handlers.messages import register_message_handlers
+from src.handlers.callbacks import register_callback_handlers
 from src.bot.logger import setup_logger
 
 # Initialize logger
@@ -24,6 +25,7 @@ def main():
     # Register handlers
     register_command_handlers(bot)
     register_message_handlers(bot, file_data, recipient_id)
+    register_callback_handlers(bot)
     
     # Start bot
     logger.info('Bot is now running')
