@@ -2,13 +2,35 @@ import datetime as dt
 import json
 from telebot import types
 from src.bot import storage
+from src.bot.redis_utils import get_redis_client, check_rate_limit
 from loguru import logger
 
-def register_message_handlers(bot, file_data, recipient_id):
+def register_message_handlers(bot, file_data, recipient_id, redis_config=None):
     """Register message handlers with the bot"""
+    
+    # Initialize Redis if config is provided
+    if redis_config:
+        get_redis_client(redis_config)
     
     @bot.message_handler(func=lambda message: True)
     def handle_message(message):
+        # Check rate limits (both fast and slow)
+        user_id = message.from_user.id
+        
+        # Check fast rate limit
+        is_limited_fast, wait_time_fast = check_rate_limit(user_id, 'fast')
+        if is_limited_fast:
+            logger.warning(f'User {user_id} exceeded fast rate limit')
+            bot.reply_to(message, 'Please slow down. Try sending messages less frequently.')
+            return
+            
+        # Check slow rate limit
+        is_limited_slow, wait_time_slow = check_rate_limit(user_id, 'slow')
+        if is_limited_slow:
+            logger.warning(f'User {user_id} exceeded slow rate limit (3 messages/minute)')
+            bot.reply_to(message, f'You have sent too many messages. Please wait {wait_time_slow} seconds before trying again.')
+            return
+        
         if not any(c.isalnum() for c in message.text):
             logger.warning(f'User {message.from_user.id} tried to send emoji-only message')
             bot.reply_to(message, 'Please include some text in your message, not just emojis.')

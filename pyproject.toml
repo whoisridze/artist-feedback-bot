@@ -11,6 +11,7 @@ python = "^3.13.2"
 pyTelegramBotAPI = "4.26.0"
 python-dotenv = "1.0.1"
 loguru = "^0.7.3"
+redis = "^5.0.1"
 
 
 [build-system]
