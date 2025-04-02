@@ -4,6 +4,9 @@ from dotenv import load_dotenv
 
 @dataclass
 class RedisConfig:
+    """
+    Data class for Redis configuration parameters.
+    """
     host: str
     port: int
     username: str
@@ -12,6 +15,9 @@ class RedisConfig:
 
 @dataclass
 class Config:
+    """
+    Data class for the overall bot configuration.
+    """
     telegram_token: str
     recipient_id: int
     redis: RedisConfig
@@ -20,6 +26,12 @@ DATA_FOLDER = os.path.join('src', 'data')
 FEEDBACK_FILE = os.path.join(DATA_FOLDER, 'feedback.json')
 
 def load_config() -> Config:
+    """
+    Loads configuration parameters from environment variables and returns a Config object.
+
+    Raises:
+        ValueError: If required configuration variables are missing.
+    """
     load_dotenv()
     
     telegram_token = os.getenv("TELEGRAM_TOKEN")

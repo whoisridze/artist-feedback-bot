@@ -4,15 +4,33 @@ from loguru import logger
 from src.bot.config import RedisConfig
 
 class RedisService:
+    """
+    Service for managing Redis connection and rate limiting.
+    """
     _instance = None
     
     def __new__(cls, config: Optional[RedisConfig] = None):
+        """
+        Implements the singleton pattern to ensure only one Redis connection exists.
+        
+        Args:
+            config (Optional[RedisConfig]): Redis configuration parameters.
+            
+        Returns:
+            RedisService: An instance of RedisService.
+        """
         if cls._instance is None and config is not None:
             cls._instance = super(RedisService, cls).__new__(cls)
             cls._instance._initialize(config)
         return cls._instance
     
     def _initialize(self, config: RedisConfig):
+        """
+        Initializes the Redis client with the given configuration.
+        
+        Args:
+            config (RedisConfig): The Redis configuration.
+        """
         try:
             self.client = redis.Redis(
                 host=config.host,
@@ -28,6 +46,17 @@ class RedisService:
             self.client = None
     
     def check_rate_limit(self, user_id: int, limit_type: str) -> Tuple[bool, int]:
+        """
+        Checks whether a user has exceeded the allowed rate limit.
+
+        Args:
+            user_id (int): The user's Telegram ID.
+            limit_type (str): The type of rate limit to check ('fast' or 'slow').
+
+        Returns:
+            Tuple[bool, int]: A tuple where the first element indicates if the rate limit is exceeded,
+                              and the second element is the remaining time to wait if exceeded.
+        """
         if not self.client:
             return False, 0
             

@@ -5,6 +5,12 @@ from loguru import logger
 LOGS_DIR = os.path.join('src', 'data', 'logs')
 
 def setup_logger():
+    """
+    Configures the logger with console and file handlers.
+
+    Returns:
+        Logger: A configured Loguru logger instance.
+    """
     os.makedirs(LOGS_DIR, exist_ok=True)
     log_file = os.path.join(LOGS_DIR, "bot_{time}.log")
     
