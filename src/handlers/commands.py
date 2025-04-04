@@ -6,7 +6,7 @@ from src.services.block_service import BlockService
 def register_command_handlers(bot: TeleBot):
     """
     Registers command handlers for the bot.
-
+    
     Args:
         bot (TeleBot): The Telegram bot instance.
     """
@@ -14,7 +14,7 @@ def register_command_handlers(bot: TeleBot):
     def send_welcome(command):
         """
         Sends a welcome message in response to /start and /help commands.
-
+        
         Args:
             command: The command message received from the user.
         """
@@ -25,9 +25,11 @@ def register_command_handlers(bot: TeleBot):
     @bot.message_handler(commands=['block'])
     def block_command(message):
         """
-        Blocks a user based on their user ID. Only the admin (recipient_id) can use this command.
-
-        Usage: /block <userid>
+        Blocks a user based on the provided identifier.
+        Only the admin (recipient_id) can use this command.
+        
+        Usage: /block <identifier>
+        Where identifier is either the username (with or without @) or the numeric ID.
         """
         config = load_config()
         if message.from_user.id != config.recipient_id:
@@ -35,23 +37,26 @@ def register_command_handlers(bot: TeleBot):
             return
         parts = message.text.split()
         if len(parts) != 2:
-            bot.reply_to(message, "Usage: /block <userid>")
+            bot.reply_to(message, "Usage: /block <identifier>")
             return
-        try:
-            userid = int(parts[1])
-        except ValueError:
-            bot.reply_to(message, "User ID must be a number.")
-            return
+        identifier = parts[1]
+        # Normalize identifier: remove "@" if present
+        if identifier.startswith('@'):
+            identifier = identifier[1:]
         block_service = BlockService()
-        block_service.block_user(userid)
-        bot.reply_to(message, f"User {userid} has been blocked.")
+        if block_service.block_user(identifier):
+            bot.reply_to(message, f"User {identifier} has been blocked.")
+        else:
+            bot.reply_to(message, f"User {identifier} is already blocked.")
 
     @bot.message_handler(commands=['unblock'])
     def unblock_command(message):
         """
-        Unblocks a user based on their user ID. Only the admin (recipient_id) can use this command.
-
-        Usage: /unblock <userid>
+        Unblocks a user based on the provided identifier.
+        Only the admin (recipient_id) can use this command.
+        
+        Usage: /unblock <identifier>
+        Where identifier is either the username (with or without @) or the numeric ID.
         """
         config = load_config()
         if message.from_user.id != config.recipient_id:
@@ -59,13 +64,13 @@ def register_command_handlers(bot: TeleBot):
             return
         parts = message.text.split()
         if len(parts) != 2:
-            bot.reply_to(message, "Usage: /unblock <userid>")
+            bot.reply_to(message, "Usage: /unblock <identifier>")
             return
-        try:
-            userid = int(parts[1])
-        except ValueError:
-            bot.reply_to(message, "User ID must be a number.")
-            return
+        identifier = parts[1]
+        if identifier.startswith('@'):
+            identifier = identifier[1:]
         block_service = BlockService()
-        block_service.unblock_user(userid)
-        bot.reply_to(message, f"User {userid} has been unblocked.")
+        if block_service.unblock_user(identifier):
+            bot.reply_to(message, f"User {identifier} has been unblocked.")
+        else:
+            bot.reply_to(message, f"User {identifier} is not blocked.")
