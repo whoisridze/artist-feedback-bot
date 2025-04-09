@@ -38,25 +38,25 @@ def register_callback_handlers(bot: TeleBot, block_service):
                 
                 # Rebuild the inline keyboard with updated block/unblock button
                 btn_answer_group = types.InlineKeyboardButton(
-                    "Answer for Group",
+                    "Group",
                     callback_data=json.dumps({'action': 'answer_group'})
                 )
                 btn_answer_bot = types.InlineKeyboardButton(
-                    "Answer in Bot",
+                    "In Bot",
                     callback_data=json.dumps({'action': 'answer_bot', 'user_id': user_id})
                 )
                 btn_direct_msg = types.InlineKeyboardButton(
-                    "Direct Message",
+                    "DM",
                     url=f"tg://user?id={user_id}"
                 )
                 if block_service.is_blocked(identifier):
                     btn_block = types.InlineKeyboardButton(
-                        "Unblock User",
+                        "Unblock",
                         callback_data=json.dumps({'a': 'u', 'i': identifier, 'u': user_id})
                     )
                 else:
                     btn_block = types.InlineKeyboardButton(
-                        "Block User",
+                        "Block",
                         callback_data=json.dumps({'a': 'b', 'i': identifier, 'u': user_id})
                     )
                 new_markup = types.InlineKeyboardMarkup(row_width=4)

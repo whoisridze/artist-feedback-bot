@@ -61,27 +61,27 @@ def register_message_handlers(bot: TeleBot, storage: StorageService, recipient_i
         # Build the inline keyboard for the admin message
         markup = types.InlineKeyboardMarkup(row_width=4)
         btn_answer_group = types.InlineKeyboardButton(
-            "Answer for Group",
+            "Group",
             callback_data=json.dumps({"action": "answer_group"})
         )
         btn_answer_bot = types.InlineKeyboardButton(
-            "Answer in Bot",
+            "In Bot",
             callback_data=json.dumps({"action": "answer_bot", "user_id": user_id})
         )
         btn_direct_msg = types.InlineKeyboardButton(
-            "Direct Message",
+            "DM",
             url=f"tg://user?id={user_id}"
         )
         # Add block/unblock button using compact callback data
         if block_service:
             if block_service.is_blocked(user_identifier):
                 btn_block = types.InlineKeyboardButton(
-                    "Unblock User",
+                    "Unblock",
                     callback_data=json.dumps({"a": "u", "i": user_identifier, "u": user_id})
                 )
             else:
                 btn_block = types.InlineKeyboardButton(
-                    "Block User",
+                    "Block",
                     callback_data=json.dumps({"a": "b", "i": user_identifier, "u": user_id})
                 )
             markup.add(btn_answer_group, btn_answer_bot, btn_direct_msg, btn_block)
